@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <style>
 
-.axis text, .path text {
+text {
   font: 10px sans-serif;
 }
 
@@ -60,6 +60,7 @@
       console.log(plainfancy);
 
       plainfancy.enter()
+      .append("a").attr("xlink:href", function(d) { return "http://www.metmuseum.org/Collections/search-the-collections/"+d.key})
       .append("text").text(function(d) { return d.key; })
         .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
         .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
