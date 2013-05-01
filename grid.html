@@ -17,7 +17,7 @@
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script>
     var margin = {top: 30, right: 10, bottom: 10, left: 10},
-      width = 960 - margin.left - margin.right,
+      width = 500 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
     var svg = d3.select("body").append("svg")
@@ -60,11 +60,9 @@
       console.log(plainfancy);
 
       plainfancy.enter()
-      .append("path").text(function(d) { return d.key; })
-        .attr("x", function(d) { return (d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy); })
-        .attr("y", function(d) { return (d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle); })
-        .attr("transform", function(d) { return "translate(" + x(this.getAttribute("x")) + "," + y(this.getAttribute("x")) + ")"; })
-        .attr("d", d3.svg.symbol());
+      .append("text").text(function(d) { return d.key; })
+        .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
+        .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
 
       svg.append("g")
           .attr("class", "x axis")
