@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis text, .path text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+</style>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+    var margin = {top: 30, right: 10, bottom: 10, left: 10},
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    d3.json("./1365432677.json", function(error, data) {
+      var nested =
+        d3.nest()
+          .key(function(d) { return d.object_id; })
+          .rollup(function(leaves) { return {
+            "plain": d3.sum(leaves, function(d) {return d.plain != null && d.plain === true  ?  -1 : 0;}),
+            "fancy": d3.sum(leaves, function(d) {return d.plain != null && d.plain === false ?   1 : 0;}),
+            "notmystyle": d3.sum(leaves, function(d) {return d.mystyle != null && d.mystyle === false ?   -1 : 0;}),
+            "mystyle": d3.sum(leaves, function(d) {return d.mystyle != null && d.mystyle === true  ?  1 : 0;})
+          }})
+          .entries(data)
+
+      var x = d3.scale.linear()
+        .domain([-1,1])
+        .range([0, width]);
+
+      var y = d3.scale.linear()
+        .domain([1,-1])
+        .range([0, height]);
+
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("top");
+
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("right");
+
+      // plain
+      var plainfancy = svg.selectAll(".grid").data(nested)
+      console.log(plainfancy);
+
+      plainfancy.enter()
+      .append("path").text(function(d) { return d.key; })
+        .attr("x", function(d) { return (d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy); })
+        .attr("y", function(d) { return (d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle); })
+        .attr("transform", function(d) { return "translate(" + x(this.getAttribute("x")) + "," + y(this.getAttribute("x")) + ")"; })
+        .attr("d", d3.svg.symbol());
+
+      svg.append("g")
+          .attr("class", "x axis")
+          .call(xAxis);
+
+      svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis);
+    });
+  </script>
+</body>
