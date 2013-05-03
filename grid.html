@@ -61,9 +61,10 @@ text {
 
       plainfancy.enter()
       .append("a").attr("xlink:href", function(d) { return "http://www.metmuseum.org/Collections/search-the-collections/"+d.key})
-      .append("text").text(function(d) { return d.key; })
+      .append("image").attr("xlink:href", function(d) { return "icons/"+d.key+".png"; })
         .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
         .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
+        .attr("width", 48).attr("height", 48)
 
       svg.append("g")
           .attr("class", "x axis")
