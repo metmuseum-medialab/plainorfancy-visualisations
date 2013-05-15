@@ -64,15 +64,7 @@ text {
         .orient("right");
 
       // plain
-      var plainfancy = svg.selectAll(".grid").data(nested)
-      console.log(plainfancy);
-
-      plainfancy.enter()
-      .append("a").attr("xlink:href", function(d) { return "http://www.metmuseum.org/Collections/search-the-collections/"+d.key})
-      .append("image").attr("xlink:href", function(d) { return "icons/"+d.key+".png"; })
-        .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
-        .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
-        .attr("width", 24).attr("height", 24)
+      var plainfancy = svg.selectAll(".grid").data(nested);
 
       svg.append("g")
           .attr("class", "x axis")
@@ -83,6 +75,13 @@ text {
           .attr("class", "y axis")
           .attr("transform", "translate("+x(0)+",0)")
           .call(yAxis);
+
+      plainfancy.enter()
+      .append("a").attr("xlink:href", function(d) { return "http://www.metmuseum.org/Collections/search-the-collections/"+d.key})
+      .append("image").attr("xlink:href", function(d) { return "icons/"+d.key+".png"; })
+        .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
+        .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
+        .attr("width", 24).attr("height", 24)
     });
   </script>
 </body>
