@@ -21,6 +21,7 @@ text {
 <body>
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script>
+    var scale = 0.8;
     var margin = {top: 30, right: 10, bottom: 10, left: 10},
       width = 700 - margin.left - margin.right,
       height = 700 - margin.top - margin.bottom;
@@ -45,11 +46,11 @@ text {
           .entries(data)
 
       var x = d3.scale.linear()
-        .domain([-1,1])
+        .domain([-1*scale,1*scale])
         .range([0, width]);
 
       var y = d3.scale.linear()
-        .domain([1,-1])
+        .domain([1*scale,-1*scale])
         .range([0, height]);
 
       var xAxis = d3.svg.axis()
