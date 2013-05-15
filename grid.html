@@ -55,7 +55,7 @@ text {
 
       var xAxis = d3.svg.axis()
         .scale(x)
-        .orient("top");
+        .orient("bottom");
 
       var yAxis = d3.svg.axis()
         .scale(y)
@@ -74,10 +74,12 @@ text {
 
       svg.append("g")
           .attr("class", "x axis")
+          .attr("transform", "translate(0,"+y(0)+")")
           .call(xAxis);
 
       svg.append("g")
           .attr("class", "y axis")
+          .attr("transform", "translate("+x(0)+",0)")
           .call(yAxis);
     });
   </script>
