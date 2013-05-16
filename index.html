@@ -19,10 +19,99 @@ text {
 
 </style>
 <body>
-  <p>Here is a pretty graph</p>
-  <p>plain on the left, fancy on the right</p>
-  <p>my style up top, not my style down below</p>
   <script src="d3.min.js"></script>
+  <h2> Entries per day in the gallery </h2>
+  <div id="chart"></div>
+  <script id="csv" type="text/csv">Day, Entries (day), Entries (total)
+    Sunday,75.75,303
+    Monday,64.33,193
+    Tuesday,124,496
+    Wednesday,117,468
+    Thursday,87.75,351
+    Friday,122.5,490
+    Saturday,120.5,482
+  </script>
+  <script>
+    // BAR CHART
+    function renderChart() {
+      var data = d3.csv.parse(d3.select('#csv').text());
+      var valueLabelWidth = 40; // space reserved for value labels (right)
+      var barHeight = 20; // height of one bar
+      var barLabelWidth = 100; // space reserved for bar labels
+      var barLabelPadding = 5; // padding between bar and bar labels (left)
+      var gridLabelHeight = 18; // space reserved for gridline labels
+      var gridChartOffset = 3; // space between start of grid and first bar
+      var maxBarWidth = 420; // width of the bar with the max value
+       
+      // accessor functions 
+      var barLabel = function(d) { return d['Day']; };
+      var barValue = function(d) { return parseFloat(d[' Entries (day)']); };
+       
+      // scales
+      var yScale = d3.scale.ordinal().domain(d3.range(0, data.length)).rangeBands([0, data.length * barHeight]);
+      var y = function(d, i) { return yScale(i); };
+      var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
+      var x = d3.scale.linear().domain([0, d3.max(data, barValue)]).range([0, maxBarWidth]);
+      // svg container element
+      var chart = d3.select('#chart').append("svg")
+        .attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
+        .attr('height', gridLabelHeight + gridChartOffset + data.length * barHeight);
+      // grid line labels
+      var gridContainer = chart.append('g')
+        .attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
+      gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
+        .attr("x", x)
+        .attr("dy", -3)
+        .attr("text-anchor", "middle")
+        .text(String);
+      // vertical grid lines
+      gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
+        .attr("x1", x)
+        .attr("x2", x)
+        .attr("y1", 0)
+        .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+        .style("stroke", "#ccc");
+      // bar labels
+      var labelsContainer = chart.append('g')
+        .attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+      labelsContainer.selectAll('text').data(data).enter().append('text')
+        .attr('y', yText)
+        .attr('stroke', 'none')
+        .attr('fill', 'black')
+        .attr("dy", ".35em") // vertical-align: middle
+        .attr('text-anchor', 'end')
+        .text(barLabel);
+      // bars
+      var barsContainer = chart.append('g')
+        .attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
+      barsContainer.selectAll("rect").data(data).enter().append("rect")
+        .attr('y', y)
+        .attr('height', yScale.rangeBand())
+        .attr('width', function(d) { return x(barValue(d)); })
+        .attr('stroke', 'white')
+        .attr('fill', 'steelblue');
+      // bar value labels
+      barsContainer.selectAll("text").data(data).enter().append("text")
+        .attr("x", function(d) { return x(barValue(d)); })
+        .attr("y", yText)
+        .attr("dx", 3) // padding-left
+        .attr("dy", ".35em") // vertical-align: middle
+        .attr("text-anchor", "start") // text-align: right
+        .attr("fill", "black")
+        .attr("stroke", "none")
+        .text(function(d) { return d3.round(barValue(d), 2); });
+      // start line
+      barsContainer.append("line")
+        .attr("y1", -gridChartOffset)
+        .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+        .style("stroke", "#000");
+      }
+  </script>
+  <script>renderChart();</script>
+
+  <h2> Grid chart </h2>
+  <h4> X-axis goes from plain (left) to fancy (right) </h4>
+  <h4> Y-axis goes from my style (top) to not-my-style (bottom) </h4>  
   <script>
     var scale = 0.8;
     var margin = {top: 30, right: 10, bottom: 10, left: 10},
@@ -86,5 +175,30 @@ text {
         .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
         .attr("width", 24).attr("height", 24)
     });
+    // DAY OF THE WEEK
+    d3.json("./1365432677.json", function(error, data) {
+      var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      var nested =
+        d3.nest()
+          .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
+            .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
+          .key(function(d) { return new Date(d.timestamp).toDateString(); })
+          .rollup(function(leaves) { return leaves.length })
+          .entries(data);
+      console.log(nested);
+    })
+    // TOTALS
+    d3.json("./1365432677.json", function(error, data) {
+      var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      var records = [4,3,4,4,4,4,4];
+      var nested =
+        d3.nest()
+          .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
+            .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
+          .rollup(function(leaves) { return leaves.length })
+          .entries(data);
+      console.log(nested);
+    })
+
   </script>
 </body>
