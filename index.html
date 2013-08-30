@@ -221,12 +221,12 @@
               .orient("right");
 
             svg.append("g")
-                .attr("class", "x axis")
+                .attr("class", "y axis")
                 .attr("transform", "translate(0,"+y(0)+")")
                 .call(xAxis);
 
             svg.append("g")
-                .attr("class", "y axis")
+                .attr("class", "x axis")
                 .attr("transform", "translate("+x(0)+",0)")
                 .call(yAxis);
 
@@ -240,10 +240,7 @@
                 .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
                 .attr("width", 24)
                 .attr("height", 24)
-                .on("mouseover", function(d){
-                  console.log(d);
-                  d3.select(this).attr("fill","red");
-                })
+                .on("mouseover", function(d){ console.log(d); })
           });
         </script>
       </div>
