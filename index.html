@@ -81,17 +81,32 @@
           var gridChartOffset = 3; // space between start of grid and first bar
           var maxBarWidth = 420; // width of the bar with the max value
 
+          var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
           // BAR CHART
           d3.json(data, function(error, data) {
             data = data.filter(function(d) { return d.timestamp > 0;});
-            var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-            var nested =
-              d3.nest()
+            data.sort(function(a,b) {return a.timestamp - b.timestamp});
+            
+            var totals = d3.nest()
                 .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
                   .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
-                .rollup(function(leaves) { return leaves.length })
+                .rollup(function(leaves) { return leaves.length; })
                 .entries(data);
-            
+            console.log(totals);
+
+            var nested = d3.nest()
+              .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
+                .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
+              .key(function(d) { return new Date(d.timestamp).toDateString(); })
+              .rollup(function(leaves) { return leaves.length; })
+              .entries(data)
+              .map(function(d){ return {
+                key: d.key;
+                values: d.values.length }}
+              )
+              
+            console.log(nested);
+
             // accessor functions 
             var barLabel = function(d) { return d.key; };
             var barValue = function(d) { return parseInt(d.values); };
@@ -229,20 +244,6 @@
                   console.log(d);
                   d3.select(this).attr("fill","red");
                 })
-          });
-
-          console.log('Entries by day of week')
-          d3.json(data, function(error, data) {
-            data = data.filter(function(d) { return d.timestamp > 0;});
-            var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-            var nested =
-              d3.nest()
-                .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
-                  .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
-                .key(function(d) { return new Date(d.timestamp).toDateString(); })
-                .rollup(function(leaves) { return leaves.length })
-                .entries(data);
-            console.log(nested);
           });
         </script>
       </div>
