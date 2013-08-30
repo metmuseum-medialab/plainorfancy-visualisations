@@ -1,66 +1,15 @@
 <!DOCTYPE html>
-<html>
 <head>
   <meta charset='utf-8'>
   <title>Plain or Fancy Visualisation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet" />
+  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600' rel='stylesheet'>
   <!-- Many thanks to http://www.williamghelfi.com/blog/2013/08/04/bootstrap-in-practice-a-landing-page/ //-->
 
-  <style>
-    @font-face {
-      font-family: Muchacho;
-      src: url("Muchacho.otf") format("opentype");
-    }
-
-    /* http://css-tricks.com/perfect-full-page-background-image/ */
-    html {
-        background: url(background.jpg) no-repeat center center fixed; 
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-    }
-
-    body {
-      padding-top: 20px;
-      font-size: 16px;
-      font-family: "Open Sans",serif;
-      background: transparent;
-    }
-
-    h1 {
-      font-family: "Muchacho", Arial, sans-serif;
-      font-weight: 400;
-      font-size: 40px;
-    }
-
-    .panel {
-      background-color: rgba(255, 255, 255, 0.9);
-    }
-
-    .margin-base-vertical {
-      margin: 40px 0;
-    }
-  </style>
-  <style>
-    text {
-      font: 10px sans-serif;
-    }
-
-    .axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .axis text {
-      display: none;
-    }
-  </style>
+  <link href='css/splash.css' rel='stylesheet'>
+  <link href='css/visualisations.css' rel='stylesheet'> 
 </head>
 
 <body>
@@ -70,181 +19,14 @@
       <div class="col-lg-8 col-offset-2 panel">
         <h1 class="margin-base-vertical">TOTALS</h1>
         <div id="chart"></div>
-
-        <script>
-          var data = "data/plain_or_fancy_without_tweets_as_array.json";
-          var valueLabelWidth = 40; // space reserved for value labels (right)
-          var barHeight = 20; // height of one bar
-          var barLabelWidth = 100; // space reserved for bar labels
-          var barLabelPadding = 5; // padding between bar and bar labels (left)
-          var gridLabelHeight = 18; // space reserved for gridline labels
-          var gridChartOffset = 3; // space between start of grid and first bar
-          var maxBarWidth = 420; // width of the bar with the max value
-
-          var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-          // BAR CHART
-          d3.json(data, function(error, data) {
-            data = data.filter(function(d) { return d.timestamp > 0;});
-            data.sort(function(a,b) {return a.timestamp - b.timestamp});
-            
-            var totals = d3.nest()
-                .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
-                  .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
-                .rollup(function(leaves) { return leaves.length; })
-                .entries(data);
-            console.log(totals);
-
-            var nested = d3.nest()
-              .key(function(d) { return days[new Date(d.timestamp).getDay()]; })
-                .sortKeys(function(a,b) { return days.indexOf(a) - days.indexOf(b); })
-              .key(function(d) { return new Date(d.timestamp).toDateString(); })
-              .rollup(function(leaves) { return leaves.length; })
-              .entries(data)
-              .map(function(d){ return {
-                key: d.key;
-                values: d.values.length }}
-              )
-              
-            console.log(nested);
-
-            // accessor functions 
-            var barLabel = function(d) { return d.key; };
-            var barValue = function(d) { return parseInt(d.values); };
-             
-            // scales
-            var yScale = d3.scale.ordinal().domain(d3.range(0, nested.length)).rangeBands([0, nested.length * barHeight]);
-            var y = function(d, i) { return yScale(i); };
-            var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
-            var x = d3.scale.linear().domain([0, d3.max(nested, barValue)]).range([0, maxBarWidth]);
-            // svg container element
-            var chart = d3.select('#chart').append("svg")
-              .attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
-              .attr('height', gridLabelHeight + gridChartOffset + nested.length * barHeight);
-            // grid line labels
-            var gridContainer = chart.append('g')
-              .attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
-            gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
-              .attr("x", x)
-              .attr("dy", -3)
-              .attr("text-anchor", "middle")
-              .text(String);
-            // vertical grid lines
-            gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
-              .attr("x1", x)
-              .attr("x2", x)
-              .attr("y1", 0)
-              .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
-              .style("stroke", "#ccc");
-            // bar labels
-            var labelsContainer = chart.append('g')
-              .attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
-            labelsContainer.selectAll('text').data(nested).enter().append('text')
-              .attr('y', yText)
-              .attr('stroke', 'none')
-              .attr('fill', 'black')
-              .attr("dy", ".35em") // vertical-align: middle
-              .attr('text-anchor', 'end')
-              .text(barLabel);
-            // bars
-            var barsContainer = chart.append('g')
-              .attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
-            barsContainer.selectAll("rect").data(nested).enter().append("rect")
-              .attr('y', y)
-              .attr('height', yScale.rangeBand())
-              .attr('width', function(d) { return x(barValue(d)); })
-              .attr('stroke', 'white')
-              .attr('fill', 'steelblue');
-            // bar value labels
-            barsContainer.selectAll("text").data(nested).enter().append("text")
-              .attr("x", function(d) { return x(barValue(d)); })
-              .attr("y", yText)
-              .attr("dx", 3) // padding-left
-              .attr("dy", ".35em") // vertical-align: middle
-              .attr("text-anchor", "start") // text-align: right
-              .attr("fill", "black")
-              .attr("stroke", "none")
-              .text(function(d) { return d3.round(barValue(d), 2); });
-            // start line
-            barsContainer.append("line")
-              .attr("y1", -gridChartOffset)
-              .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
-              .style("stroke", "#000");
-          });
-        </script>
+        <script src="js/days.js"></script>
+        
 
         <h1 class="margin-base-vertical">SPREAD</h1>
         <p> X-axis goes from plain (left) to fancy (right) </p>
         <p> Y-axis goes from my style (top) to not-my-style (bottom) </p>
-        <script>
-          var data = "data/plain_or_fancy_without_tweets_as_array.json";
-          var scale = 0.8;
-          var margin = {top: 30, right: 10, bottom: 10, left: 10},
-            width = 700 - margin.left - margin.right,
-            height = 700 - margin.top - margin.bottom;
-
-          var svg = d3.select(".panel").append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-          d3.json(data, function(error, data) {
-            data = data.filter(function(d) { return d.object_id > 0; })
-            var nested =
-              d3.nest()
-                .key(function(d) { return d.object_id; })
-                .rollup(function(leaves) { return {
-                  "plain": d3.sum(leaves, function(d) {return d.plain != null && d.plain === true  ?  -1 : 0;}),
-                  "fancy": d3.sum(leaves, function(d) {return d.plain != null && d.plain === false ?   1 : 0;}),
-                  "notmystyle": d3.sum(leaves, function(d) {return d.mystyle != null && d.mystyle === false ?   -1 : 0;}),
-                  "mystyle": d3.sum(leaves, function(d) {return d.mystyle != null && d.mystyle === true  ?  1 : 0;})
-                }})
-                .entries(data)
-
-            var x = d3.scale.linear()
-              .domain([-1*scale,1*scale])
-              .range([0, width]);
-
-            var y = d3.scale.linear()
-              .domain([1*scale,-1*scale])
-              .range([0, height]);
-
-            var xAxis = d3.svg.axis()
-              .scale(x)
-              .tickSize(0, 0, 0)
-              .orient("bottom");
-
-            var yAxis = d3.svg.axis()
-              .scale(y)
-              .tickSize(0, 0, 0)
-              .orient("right");
-
-            svg.append("g")
-                .attr("class", "y axis")
-                .attr("transform", "translate(0,"+y(0)+")")
-                .call(xAxis);
-
-            svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate("+x(0)+",0)")
-                .call(yAxis);
-
-            svg
-              .selectAll(".grid")
-              .data(nested.slice(1,7))
-              .enter()
-              .append("a").attr("xlink:href", function(d) { return "http://www.metmuseum.org/Collections/search-the-collections/"+d.key})
-              .append("image").attr("xlink:href", function(d) { return "icons/"+d.key+".png"; })
-                .attr("x", function(d) { return x((d.values.plain+d.values.fancy)/(Math.abs(d.values.plain)+d.values.fancy)); })
-                .attr("y", function(d) { return y((d.values.notmystyle+d.values.mystyle)/(Math.abs(d.values.notmystyle)+d.values.mystyle)); })
-                .attr("width", 24)
-                .attr("height", 24)
-                .on("mouseover", function(d){ console.log(d); })
-          });
-        </script>
+        <script src="js/spread.js"></script>
       </div>
     </div>
   </div>
 </body>
-</html>

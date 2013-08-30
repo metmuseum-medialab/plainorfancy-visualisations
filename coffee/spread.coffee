@@ -1,0 +1,40 @@
+data = "data/plain_or_fancy_without_tweets_as_array.json"
+scale = 0.8
+margin =
+  top: 30
+  right: 10
+  bottom: 10
+  left: 10
+
+width = 700 - margin.left - margin.right
+height = 700 - margin.top - margin.bottom
+svg = d3.select(".panel").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+d3.json data, (error, data) ->
+  data = data.filter (d) -> d.object_id > 0
+  nested = d3.nest()
+    .key((d) -> d.object_id)
+    .rollup((leaves) ->
+      plain: d3.sum(leaves, (d) -> (if d.plain? and d.plain is true then -1 else 0) )
+      fancy: d3.sum(leaves, (d) -> (if d.plain? and d.plain is false then 1 else 0) )
+      notmystyle: d3.sum(leaves, (d) -> (if d.mystyle? and d.mystyle is false then -1 else 0) )
+      mystyle: d3.sum(leaves, (d) -> (if d.mystyle? and d.mystyle is true then 1 else 0) )
+    )
+    .entries(data)
+
+  x = d3.scale.linear().domain([-1 * scale, 1 * scale]).range([0, width])
+  y = d3.scale.linear().domain([1 * scale, -1 * scale]).range([0, height])
+  xAxis = d3.svg.axis().scale(x).tickSize(0, 0, 0).orient("bottom")
+  yAxis = d3.svg.axis().scale(y).tickSize(0, 0, 0).orient("right")
+  svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + y(0) + ")").call xAxis
+  svg.append("g").attr("class", "y axis").attr("transform", "translate(" + x(0) + ",0)").call yAxis
+
+  svg.selectAll(".grid").data(nested.slice(1, 7)).enter().append("a").attr("xlink:href", (d) ->
+    "http://www.metmuseum.org/Collections/search-the-collections/" + d.key)
+  .append("image").attr("xlink:href", (d) -> "icons/" + d.key + ".png")
+  .attr("x", (d) -> x (d.values.plain + d.values.fancy) / (Math.abs(d.values.plain) + d.values.fancy) )
+  .attr("y", (d) -> y (d.values.notmystyle + d.values.mystyle) / (Math.abs(d.values.notmystyle) + d.values.mystyle) )
+  .attr("width", 24).attr("height", 24).on "mouseover", (d) -> console.log d
