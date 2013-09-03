@@ -13,11 +13,10 @@ d3.json data, (error, data) ->
   data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
-  totals = d3.nest().key (d) -> days[new Date(d.timestamp).getDay()]
+  totals = d3.nest().key((d) -> days[new Date(d.timestamp).getDay()])
   .sortKeys((a, b) -> days.indexOf(a) - days.indexOf(b))
   .rollup((leaves) -> leaves.length)
   .entries(data)
-  console.log totals
 
   nested = d3.nest().key((d) -> days[new Date(d.timestamp).getDay()])
   .sortKeys((a, b) -> days.indexOf(a) - days.indexOf(b))
@@ -25,7 +24,6 @@ d3.json data, (error, data) ->
   .rollup((leaves) -> leaves.length)
   .entries(data)
   .map((d) -> {key: d.key, values: d.values.length})
-  console.log nested
   
   # accessor functions 
   barLabel = (d) -> d.key
