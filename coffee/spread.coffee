@@ -13,6 +13,38 @@ svg = d3.select(".panel").append("svg")
   .attr("height", height + margin.top + margin.bottom)
   .append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+svg.append("text")
+  .attr("class", "x label")
+  .attr("text-anchor", "end")
+  .attr("x", width/2)
+  .attr("y", height)
+  .text("not my style");
+
+svg.append("text")
+  .attr("class", "x label")
+  .attr("text-anchor", "end")
+  .attr("x", width/2)
+  .attr("y", 12)
+  .text("my style");
+
+svg.append("text")
+  .attr("class", "y label")
+  .attr("text-anchor", "end")
+  .attr("x", -height/2)
+  .attr("dy", ".75em")
+  .attr("transform", "rotate(-90)")
+  .text("plain");
+
+svg.append("text")
+  .attr("class", "y label")
+  .attr("text-anchor", "end")
+  .attr("x", height/2)
+  .attr("y", -width)
+  .attr("dy", ".75em")
+  .attr("transform", "rotate(90)")
+  .text("fancy");
+
+
 d3.json data, (error, data) ->
   data = data.filter (d) -> d.object_id > 0
   nested = d3.nest()
