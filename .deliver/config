@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+GENERATE_CMD=".deliver/generate"
+STRATEGY="gh-pages"
