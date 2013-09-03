@@ -10,7 +10,7 @@ days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 
 # BAR CHART
 d3.json data, (error, data) ->
-  data = data.filter (d) -> d.timestamp > 0
+  data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
   totals = d3.nest().key (d) -> days[new Date(d.timestamp).getDay()]
