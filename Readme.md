@@ -1,3 +1,3 @@
-Some d3.js visualisations for plain or fancy
+We have some data from plain or fancy, and heres some visualisations of that data.
 
-    python -m SimpleHTTPServer && open http://localhost:8000
+If you develop, `coffee -c -o js/ -w coffee/* & python -m SimpleHTTPServer` is probably the simplest way to start.
