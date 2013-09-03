@@ -1,0 +1,6 @@
+#!/bin/env bash
+
+mkdir -p ${GENERATED_DIR}/js
+
+cp -r *{html,js,otf,jpg} css $GENERATED_DIR
+coffee -c -o ${GENERATED_DIR}/js/ coffee/*
