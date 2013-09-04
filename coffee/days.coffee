@@ -13,11 +13,6 @@ d3.json data, (error, data) ->
   data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
-  totals = d3.nest().key((d) -> days[new Date(d.timestamp).getDay()])
-  .sortKeys((a, b) -> days.indexOf(a) - days.indexOf(b))
-  .rollup((leaves) -> leaves.length)
-  .entries(data)
-
   nested = d3.nest().key((d) -> days[new Date(d.timestamp).getDay()])
   .sortKeys((a, b) -> days.indexOf(a) - days.indexOf(b))
   .key((d) -> new Date(d.timestamp).toDateString())
@@ -41,19 +36,25 @@ d3.json data, (error, data) ->
   
   # bars
   barsContainer = chart.append("g").attr("transform", "translate(" + barLabelWidth + "," + (gridLabelHeight + gridChartOffset) + ")")
-  barsContainer.selectAll("rect").data(nested).enter().append("rect").attr("y", y).attr("height", yScale.rangeBand()).attr("width", (d) ->
-    x barValue(d)
-  ).attr("stroke", "white").attr "fill", "steelblue"
+  barsContainer.selectAll("rect").data(nested).enter().append("rect")
+  .attr("y", y)
+  .attr("height", yScale.rangeBand()).attr("width", (d) -> x barValue(d))
+  .attr("stroke", "white")
+  .attr("fill", "steelblue")
 
   # bar labels
   labelsContainer = chart.append("g").attr("transform", "translate(" + (barLabelWidth - barLabelPadding) + "," + (gridLabelHeight + gridChartOffset) + ")")
-  labelsContainer.selectAll("text").data(nested).enter().append("text").attr("y", yText).attr("stroke", "none").attr("fill", "black").attr("dy", ".35em").attr("text-anchor", "end").text barLabel
+  labelsContainer.selectAll("text").data(nested).enter().append("text")
+  .attr("y", yText)
+  .attr("dy", ".35em")
+  .attr("text-anchor", "end")
+  .text(barLabel)
   
   # bar value labels
   barsContainer.selectAll("text").data(nested).enter().append("text").attr("x", (d) ->
     x barValue(d)
   ).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").attr("fill", "black").attr("stroke", "none").text (d) ->
     d3.round barValue(d), 2
-  
-  # start line
-  barsContainer.append("line").attr("y1", -gridChartOffset).attr("y2", yScale.rangeExtent()[1] + gridChartOffset).style "stroke", "#000"
+
+  # count
+  d3.select("#dayscount").text(d3.sum(nested, (d) -> d.values));
