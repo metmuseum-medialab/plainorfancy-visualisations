@@ -13,8 +13,6 @@ d3.json data, (error, data) ->
   data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
-  d3.select("#commentcount").text(data.length);
-
   totals = d3.nest()
   .key((d) -> days[new Date(d.timestamp).getDay()])
   .sortKeys((a, b) -> days.indexOf(a) - days.indexOf(b))
@@ -35,21 +33,30 @@ d3.json data, (error, data) ->
   # container
   chart = d3.select("#comments").append("svg").attr("width", maxBarWidth + barLabelWidth + valueLabelWidth).attr("height", gridLabelHeight + gridChartOffset + totals.length * barHeight)
   
-  # bars
+  # bar
   barsContainer = chart.append("g").attr("transform", "translate(" + barLabelWidth + "," + (gridLabelHeight + gridChartOffset) + ")")
-  barsContainer.selectAll("rect").data(totals).enter().append("rect").attr("y", y).attr("height", yScale.rangeBand()).attr("width", (d) ->
-    x barValue(d)
-  ).attr("stroke", "white").attr "fill", "steelblue"
+  barsContainer.selectAll("rect").data(totals).enter().append("rect")
+  .attr("y", y)
+  .attr("height", yScale.rangeBand())
+  .attr("stroke", "white")
+  .attr("fill", "steelblue")
+  .attr("width", (d) -> x barValue(d))
 
-  # bar labels
+  # label
   labelsContainer = chart.append("g").attr("transform", "translate(" + (barLabelWidth - barLabelPadding) + "," + (gridLabelHeight + gridChartOffset) + ")")
-  labelsContainer.selectAll("text").data(totals).enter().append("text").attr("y", yText).attr("stroke", "none").attr("fill", "black").attr("dy", ".35em").attr("text-anchor", "end").text barLabel
+  labelsContainer.selectAll("text").data(totals).enter().append("text")
+  .attr("y", yText)
+  .attr("text-anchor", "end")
+  .attr("dy", ".35em")
+  .text(barLabel)
   
-  # bar value labels
-  barsContainer.selectAll("text").data(totals).enter().append("text").attr("x", (d) ->
-    x barValue(d)
-  ).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").attr("fill", "black").attr("stroke", "none").text (d) ->
-    d3.round barValue(d), 2
-  
-  # start line
-  barsContainer.append("line").attr("y1", -gridChartOffset).attr("y2", yScale.rangeExtent()[1] + gridChartOffset).style "stroke", "#000"
+  # value
+  barsContainer.selectAll("text").data(totals).enter().append("text")
+  .attr("x", (d) -> x barValue(d))
+  .attr("y", yText)
+  .attr("dx", 3)
+  .attr("dy", ".35em").attr("text-anchor", "start")
+  .text((d) -> d3.round(barValue(d), 2))
+
+  # count
+  d3.select("#commentcount").text(data.length);
