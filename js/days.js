@@ -2,7 +2,7 @@
 (function() {
   var barHeight, barLabelPadding, barLabelWidth, data, days, gridChartOffset, gridLabelHeight, maxBarWidth, valueLabelWidth;
 
-  data = "data/plain_or_fancy_without_tweets_as_array.json";
+  data = "data/no_tweets.json";
 
   valueLabelWidth = 40;
 
@@ -21,20 +21,13 @@
   days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   d3.json(data, function(error, data) {
-    var barLabel, barValue, barsContainer, chart, labelsContainer, nested, totals, x, y, yScale, yText;
+    var barLabel, barValue, barsContainer, chart, labelsContainer, nested, x, y, yScale, yText;
     data = data.filter(function(d) {
       return d.timestamp > 0 && d.comment !== "";
     });
     data.sort(function(a, b) {
       return a.timestamp - b.timestamp;
     });
-    totals = d3.nest().key(function(d) {
-      return days[new Date(d.timestamp).getDay()];
-    }).sortKeys(function(a, b) {
-      return days.indexOf(a) - days.indexOf(b);
-    }).rollup(function(leaves) {
-      return leaves.length;
-    }).entries(data);
     nested = d3.nest().key(function(d) {
       return days[new Date(d.timestamp).getDay()];
     }).sortKeys(function(a, b) {
@@ -69,13 +62,15 @@
       return x(barValue(d));
     }).attr("stroke", "white").attr("fill", "steelblue");
     labelsContainer = chart.append("g").attr("transform", "translate(" + (barLabelWidth - barLabelPadding) + "," + (gridLabelHeight + gridChartOffset) + ")");
-    labelsContainer.selectAll("text").data(nested).enter().append("text").attr("y", yText).attr("stroke", "none").attr("fill", "black").attr("dy", ".35em").attr("text-anchor", "end").text(barLabel);
+    labelsContainer.selectAll("text").data(nested).enter().append("text").attr("y", yText).attr("dy", ".35em").attr("text-anchor", "end").text(barLabel);
     barsContainer.selectAll("text").data(nested).enter().append("text").attr("x", function(d) {
       return x(barValue(d));
     }).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").attr("fill", "black").attr("stroke", "none").text(function(d) {
       return d3.round(barValue(d), 2);
     });
-    return barsContainer.append("line").attr("y1", -gridChartOffset).attr("y2", yScale.rangeExtent()[1] + gridChartOffset).style("stroke", "#000");
+    return d3.select("#dayscount").text(d3.sum(nested, function(d) {
+      return d.values;
+    }));
   });
 
 }).call(this);

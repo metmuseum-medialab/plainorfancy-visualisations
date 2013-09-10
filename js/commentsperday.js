@@ -2,7 +2,7 @@
 (function() {
   var barHeight, barLabelPadding, barLabelWidth, comments, commentsperday, commentsperdaydata, data, days, gridChartOffset, gridLabelHeight, maxBarWidth, valueLabelWidth, weeks;
 
-  data = "data/plain_or_fancy_without_tweets_as_array.json";
+  data = "data/no_tweets.json";
 
   valueLabelWidth = 40;
 
@@ -52,41 +52,13 @@
   ];
 
   d3.json(data, function(error, data) {
-    var barLabel, barValue, barsContainer, chart, labelsContainer, x, y, yScale, yText;
     data = data.filter(function(d) {
       return d.timestamp > 0 && d.comment !== "";
     });
     data.sort(function(a, b) {
       return a.timestamp - b.timestamp;
     });
-    d3.select("#comments-per-day").data(commentsperdaydata);
-    barLabel = function(d) {
-      return d.key;
-    };
-    barValue = function(d) {
-      return parseInt(d.values);
-    };
-    yScale = d3.scale.ordinal().domain(d3.range(0, perday.length)).rangeBands([0, perday.length * barHeight]);
-    y = function(d, i) {
-      return yScale(i);
-    };
-    yText = function(d, i) {
-      return y(d, i) + yScale.rangeBand() / 2;
-    };
-    x = d3.scale.linear().domain([0, d3.max(perday, barValue)]).range([0, maxBarWidth]);
-    chart = d3.select("#comments-per-day").append("svg").attr("width", maxBarWidth + barLabelWidth + valueLabelWidth).attr("height", gridLabelHeight + gridChartOffset + perday.length * barHeight);
-    barsContainer = chart.append("g").attr("transform", "translate(" + barLabelWidth + "," + (gridLabelHeight + gridChartOffset) + ")");
-    barsContainer.selectAll("rect").data(perday).enter().append("rect").attr("y", y).attr("height", yScale.rangeBand()).attr("width", function(d) {
-      return x(barValue(d));
-    }).attr("stroke", "white").attr("fill", "steelblue");
-    labelsContainer = chart.append("g").attr("transform", "translate(" + (barLabelWidth - barLabelPadding) + "," + (gridLabelHeight + gridChartOffset) + ")");
-    labelsContainer.selectAll("text").data(perday).enter().append("text").attr("y", yText).attr("stroke", "none").attr("fill", "black").attr("dy", ".35em").attr("text-anchor", "end").text(barLabel);
-    barsContainer.selectAll("text").data(perday).enter().append("text").attr("x", function(d) {
-      return x(barValue(d));
-    }).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").attr("fill", "black").attr("stroke", "none").text(function(d) {
-      return d3.round(barValue(d), 2);
-    });
-    return barsContainer.append("line").attr("y1", -gridChartOffset).attr("y2", yScale.rangeExtent()[1] + gridChartOffset).style("stroke", "#000");
+    return d3.select("#comments-per-day").data(commentsperdaydata);
   });
 
 }).call(this);

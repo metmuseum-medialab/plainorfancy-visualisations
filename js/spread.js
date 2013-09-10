@@ -2,7 +2,7 @@
 (function() {
   var data, height, margin, scale, svg, width;
 
-  data = "data/plain_or_fancy_without_tweets_as_array.json";
+  data = "data/no_tweets.json";
 
   scale = 0.8;
 
@@ -50,15 +50,15 @@
             return 0;
           }
         }),
-        notmystyle: d3.sum(leaves, function(d) {
-          if ((d.mystyle != null) && d.mystyle === false) {
+        nostyle: d3.sum(leaves, function(d) {
+          if ((d.style != null) && d.style === false) {
             return -1;
           } else {
             return 0;
           }
         }),
-        mystyle: d3.sum(leaves, function(d) {
-          if ((d.mystyle != null) && d.mystyle === true) {
+        style: d3.sum(leaves, function(d) {
+          if ((d.style != null) && d.style === true) {
             return 1;
           } else {
             return 0;
@@ -79,7 +79,7 @@
     }).attr("x", function(d) {
       return x((d.values.plain + d.values.fancy) / (Math.abs(d.values.plain) + d.values.fancy));
     }).attr("y", function(d) {
-      return y((d.values.notmystyle + d.values.mystyle) / (Math.abs(d.values.notmystyle) + d.values.mystyle));
+      return y((d.values.nostyle + d.values.style) / (Math.abs(d.values.nostyle) + d.values.style));
     }).attr("width", 24).attr("height", 24).on("mouseover", function(d) {
       return console.log(d);
     });

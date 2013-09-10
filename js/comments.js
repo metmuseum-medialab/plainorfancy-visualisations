@@ -2,7 +2,7 @@
 (function() {
   var barHeight, barLabelPadding, barLabelWidth, data, days, gridChartOffset, gridLabelHeight, maxBarWidth, valueLabelWidth;
 
-  data = "data/plain_or_fancy_without_tweets_as_array.json";
+  data = "data/no_tweets.json";
 
   valueLabelWidth = 40;
 
@@ -28,7 +28,6 @@
     data.sort(function(a, b) {
       return a.timestamp - b.timestamp;
     });
-    d3.select("#commentcount").text(data.length);
     totals = d3.nest().key(function(d) {
       return days[new Date(d.timestamp).getDay()];
     }).sortKeys(function(a, b) {
@@ -52,17 +51,17 @@
     x = d3.scale.linear().domain([0, d3.max(totals, barValue)]).range([0, maxBarWidth]);
     chart = d3.select("#comments").append("svg").attr("width", maxBarWidth + barLabelWidth + valueLabelWidth).attr("height", gridLabelHeight + gridChartOffset + totals.length * barHeight);
     barsContainer = chart.append("g").attr("transform", "translate(" + barLabelWidth + "," + (gridLabelHeight + gridChartOffset) + ")");
-    barsContainer.selectAll("rect").data(totals).enter().append("rect").attr("y", y).attr("height", yScale.rangeBand()).attr("width", function(d) {
+    barsContainer.selectAll("rect").data(totals).enter().append("rect").attr("y", y).attr("height", yScale.rangeBand()).attr("stroke", "white").attr("fill", "steelblue").attr("width", function(d) {
       return x(barValue(d));
-    }).attr("stroke", "white").attr("fill", "steelblue");
+    });
     labelsContainer = chart.append("g").attr("transform", "translate(" + (barLabelWidth - barLabelPadding) + "," + (gridLabelHeight + gridChartOffset) + ")");
-    labelsContainer.selectAll("text").data(totals).enter().append("text").attr("y", yText).attr("stroke", "none").attr("fill", "black").attr("dy", ".35em").attr("text-anchor", "end").text(barLabel);
+    labelsContainer.selectAll("text").data(totals).enter().append("text").attr("y", yText).attr("text-anchor", "end").attr("dy", ".35em").text(barLabel);
     barsContainer.selectAll("text").data(totals).enter().append("text").attr("x", function(d) {
       return x(barValue(d));
-    }).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").attr("fill", "black").attr("stroke", "none").text(function(d) {
+    }).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").text(function(d) {
       return d3.round(barValue(d), 2);
     });
-    return barsContainer.append("line").attr("y1", -gridChartOffset).attr("y2", yScale.rangeExtent()[1] + gridChartOffset).style("stroke", "#000");
+    return d3.select("#commentcount").text(data.length);
   });
 
 }).call(this);
