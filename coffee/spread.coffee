@@ -46,7 +46,7 @@ svg.append("text")
 
 
 d3.json data, (error, data) ->
-  data = data.filter (d) -> d.object_id > 0
+  data = data.filter (d) -> d.timestamp > 0 and d.object_id > 0
   nested = d3.nest()
     .key((d) -> d.object_id)
     .rollup((leaves) ->
