@@ -1,4 +1,4 @@
-data = "data/plain_or_fancy_without_tweets_as_array.json"
+data = "data/no_tweets.json"
 scale = 0.8
 margin =
   top: 30
@@ -52,8 +52,8 @@ d3.json data, (error, data) ->
     .rollup((leaves) ->
       plain: d3.sum(leaves, (d) -> (if d.plain? and d.plain is true then -1 else 0) )
       fancy: d3.sum(leaves, (d) -> (if d.plain? and d.plain is false then 1 else 0) )
-      notmystyle: d3.sum(leaves, (d) -> (if d.mystyle? and d.mystyle is false then -1 else 0) )
-      mystyle: d3.sum(leaves, (d) -> (if d.mystyle? and d.mystyle is true then 1 else 0) )
+      nostyle: d3.sum(leaves, (d) -> (if d.style? and d.style is false then -1 else 0) )
+      style: d3.sum(leaves, (d) -> (if d.style? and d.style is true then 1 else 0) )
     )
     .entries(data)
 
@@ -68,5 +68,5 @@ d3.json data, (error, data) ->
     "http://www.metmuseum.org/Collections/search-the-collections/" + d.key)
   .append("image").attr("xlink:href", (d) -> "icons/" + d.key + ".png")
   .attr("x", (d) -> x (d.values.plain + d.values.fancy) / (Math.abs(d.values.plain) + d.values.fancy) )
-  .attr("y", (d) -> y (d.values.notmystyle + d.values.mystyle) / (Math.abs(d.values.notmystyle) + d.values.mystyle) )
+  .attr("y", (d) -> y (d.values.nostyle + d.values.style) / (Math.abs(d.values.nostyle) + d.values.style) )
   .attr("width", 24).attr("height", 24).on "mouseover", (d) -> console.log d

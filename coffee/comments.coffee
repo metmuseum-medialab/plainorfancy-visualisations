@@ -1,4 +1,4 @@
-data = "data/plain_or_fancy_without_tweets_as_array.json"
+data = "data/no_tweets.json"
 valueLabelWidth = 40 # space reserved for value labels (right)
 barHeight = 20 # height of one bar
 barLabelWidth = 100 # space reserved for bar labels
