@@ -21,7 +21,8 @@ commentsperdaydata = [
   {key: "Saturday", values: 97}]
 
 d3.json data, (error, data) ->
-  data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
+  entries = data.filter (d) -> d.timestamp > 0
+  data = entries.filter (d) -> d.comment isnt ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
-  d3.select("#comments-per-day").data(commentsperdaydata);
+  d3.select("#comments-per-day").data(commentsperdaydata)
