@@ -10,7 +10,8 @@ days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satur
 
 # BAR CHART
 d3.json data, (error, data) ->
-  data = data.filter (d) -> d.timestamp > 0 && d.comment != ""
+  entries = data.filter (d) -> d.timestamp > 0
+  data = entries.filter (d) -> d.comment isnt ""
   data.sort (a, b) -> a.timestamp - b.timestamp
 
   totals = d3.nest()
@@ -60,3 +61,4 @@ d3.json data, (error, data) ->
 
   # count
   d3.select("#commentcount").text(data.length);
+  d3.select("#entrycount").text(entries.length);
