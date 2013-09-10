@@ -21,9 +21,12 @@
   days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   d3.json(data, function(error, data) {
-    var barLabel, barValue, barsContainer, chart, labelsContainer, totals, x, y, yScale, yText;
-    data = data.filter(function(d) {
-      return d.timestamp > 0 && d.comment !== "";
+    var barLabel, barValue, barsContainer, chart, entries, labelsContainer, totals, x, y, yScale, yText;
+    entries = data.filter(function(d) {
+      return d.timestamp > 0;
+    });
+    data = entries.filter(function(d) {
+      return d.comment !== "";
     });
     data.sort(function(a, b) {
       return a.timestamp - b.timestamp;
@@ -61,7 +64,8 @@
     }).attr("y", yText).attr("dx", 3).attr("dy", ".35em").attr("text-anchor", "start").text(function(d) {
       return d3.round(barValue(d), 2);
     });
-    return d3.select("#commentcount").text(data.length);
+    d3.select("#commentcount").text(data.length);
+    return d3.select("#entrycount").text(entries.length);
   });
 
 }).call(this);

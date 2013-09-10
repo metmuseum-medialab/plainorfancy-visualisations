@@ -52,8 +52,12 @@
   ];
 
   d3.json(data, function(error, data) {
-    data = data.filter(function(d) {
-      return d.timestamp > 0 && d.comment !== "";
+    var entries;
+    entries = data.filter(function(d) {
+      return d.timestamp > 0;
+    });
+    data = entries.filter(function(d) {
+      return d.comment !== "";
     });
     data.sort(function(a, b) {
       return a.timestamp - b.timestamp;

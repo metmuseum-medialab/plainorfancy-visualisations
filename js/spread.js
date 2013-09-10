@@ -30,7 +30,7 @@
   d3.json(data, function(error, data) {
     var nested, x, xAxis, y, yAxis;
     data = data.filter(function(d) {
-      return d.object_id > 0;
+      return d.timestamp > 0 && d.object_id > 0;
     });
     nested = d3.nest().key(function(d) {
       return d.object_id;
